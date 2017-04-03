@@ -23,8 +23,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        
-        app()->setlocale('kh');
         return view('home');
     }
 }

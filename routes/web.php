@@ -12,10 +12,15 @@
 */
 
 Route::get('/', function () {
-	Lang::setLocale('kh');
+	app()->setlocale(session()->get('locale'));
     return view('welcome');
 });
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+Route::GET('/language',[
+		'as' => 'language-chooser',
+		'uses' => 'LanguageController@changeLanguage'
+]);
