@@ -213,7 +213,7 @@
         </li>
           @if (Route::has('login'))
                     @if (Auth::check())
-                        <li><a href="{{ url('/home') }}">@trans('transwelcome.home') </a></li>
+                        <li><a href="{{ url('/home') }}"> Admin Panel</a></li>
                     @else
                         <li><a href="{{ url('/login') }}">{{ trans('transwelcome.login') }}</a></li>
                         <li><a href="{{ url('/register') }}">{{ trans('transwelcome.register') }}</a></li>

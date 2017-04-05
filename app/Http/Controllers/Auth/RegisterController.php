@@ -7,6 +7,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
+use Illuminate\Http\Request;
+use Mail;
+use DB;
+use App\Mail\ConfirmationEmail;
+use Illuminate\Auth\Events\Registered;
+
 class RegisterController extends Controller
 {
     /*
@@ -68,7 +74,57 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
-    public function register(){
+
+    public function register(Request $request){
+        $this->validator($request->all())->validate();
+        event(new Registered($user= $this->create($request->all())));
+        //php artisan make:mail ConfirmationEmail
+        Mail::to($user->email)->send(new ConfirmationEmail($user));
+        return redirect(route('login'))->with('status',"Please confirmed your email address.");
+    }
+
+
+    // public function register(Request $request){
+    //     $input = $request->all();
         
+    //     $validator = Validator::make($request->all(),[
+    //         'name' =>'required|max:255',
+    //         'email' => 'required|email|max:255|unique:users',
+    //         'password'=>'required|min:6|confirmed',
+    //     ]);
+    //     if($validator->passes()){
+    //         $data = $this->create($input)->toArray();
+    //         $data['token'] = str_random(25);
+
+    //         DB::beginTransaction();
+    //         try{
+    //             $user = User::find($data['id']);
+    //             $user->token = $data['token'];
+    //             // dd($user->token);//"te1Fkr4qUhQb1W4cdSaB39haM
+    //             $user->save();
+    //             //emails.confirmation in resources/view/mails/confirmation.php
+    //             Mail::send('emails.confirmation', $data, function($message) use ($data){
+    //                 $message->to($data['email']);
+    //                 $message->subject('Registeration Confirmation');
+    //             });
+    //         }catch(Exception $e){
+    //             DB::rollback();
+    //             return back();
+    //         }
+    //         return redirect(route('login'))->with('status','Confirmation email has been send, please check your email!');
+    //     }
+    //     return redirect()->back()->with('status',$validator->errors());
+    // }
+
+
+    public function confirmation($token){
+        $user = User::where('token',$token)->first();
+        if(!is_null($user)){
+            $user->confirmed = 1;
+            $user->token = "";
+            $user->save();
+            return redirect(route('login'))->with('status','Your activation is completed!');
+        }
+        return redirect(route('login'))->with('status','Somethin went wrong! please check email again!');
     }
 }

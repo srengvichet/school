@@ -17,10 +17,14 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
 Route::get('/home', 'HomeController@index');
 
 Route::GET('/language',[
 		'as' => 'language-chooser',
 		'uses' => 'LanguageController@changeLanguage'
 ]);
+
+
+Route::get('/user/confirmation/{token}', 
+	'Auth\RegisterController@confirmation')
+	->name('confirmation');
